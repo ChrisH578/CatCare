@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CatCare</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header>
+      <h1>CatCare</h1>
+      <select id="catSelector"></select>
+      <button id="addCatBtn">+ Neue Katze</button>
+    </header>
+
+    <main id="mainContent"></main>
+
+    <nav class="bottom-nav">
+      <button data-page="dashboard">🏠</button>
+      <button data-page="weight">⚖️</button>
+      <button data-page="food">🍽</button>
+      <button data-page="play">🎾</button>
+      <button data-page="sleep">😴</button>
+      <button data-page="vet">🏥</button>
+      <button data-page="meds">💊</button>
+      <button data-page="settings">⚙️</button>
+    </nav>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
