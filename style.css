@@ -1,57 +1,165 @@
+/* ==========================
+   CatCare Modern Style v1
+   Light & Dark Mode
+   ========================== */
+
+/* --------------------------
+   Farben & Variablen
+--------------------------- */
 :root {
-  --bg: #121212;
-  --card: #1E1E1E;
-  --text: #ffffff;
-  --accent: #4da3ff;
+  --bg-color: #f4f4f6;        /* heller Hintergrund Light Mode */
+  --text-color: #1a1a1a;      /* dunkler Text */
+  --card-bg: #ffffff;          /* weiße Karten */
+  --accent-color: #7b5fff;    /* Buttons / Highlights */
+  --secondary-color: #e0e0e0;  /* leichte Akzente / Trennlinien */
 }
 
-.light {
-  --bg: #f5f5f5;
-  --card: #ffffff;
-  --text: #000000;
+body.dark {
+  --bg-color: #1e1e2f;        /* dunkler Hintergrund Dark Mode */
+  --text-color: #eaeaea;      /* heller Text */
+  --card-bg: #2c2c3a;          /* Karten dunkel */
+  --accent-color: #9c7dff;    /* Buttons / Highlights */
+  --secondary-color: #3a3a4a;  /* leichte Akzente */
 }
 
+/* --------------------------
+   Allgemeines Layout
+--------------------------- */
 body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  padding: 0;
 }
 
-header {
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+h1, h2, h3 {
+  font-weight: 600;
+  margin: 12px 0;
 }
 
-main {
-  padding: 15px;
-  padding-bottom: 100px;
+p, label {
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* --------------------------
+   Container / Karten
+--------------------------- */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
 }
 
 .card {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  background-color: var(--card-bg);
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* --------------------------
+   Buttons
+--------------------------- */
 button {
-  background: var(--accent);
+  background-color: var(--accent-color);
+  color: #fff;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: white;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
+button:hover {
+  background-color: #5a3fcc;
+  transform: translateY(-1px);
+}
+
+/* --------------------------
+   Formulare / Inputs
+--------------------------- */
+input, select, textarea {
   width: 100%;
+  padding: 10px 12px;
+  margin: 6px 0 12px 0;
+  border-radius: 10px;
+  border: 1px solid var(--secondary-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent-color);
+}
+
+/* --------------------------
+   Navigation / Footer
+--------------------------- */
+.navbar {
   display: flex;
   justify-content: space-around;
-  background: var(--card);
+  background-color: var(--card-bg);
   padding: 10px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  position: sticky;
+  bottom: 0;
+  border-radius: 16px 16px 0 0;
+}
+
+.navbar button {
+  flex: 1;
+  margin: 0 4px;
+}
+
+/* --------------------------
+   Tabellen / Listen
+--------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--secondary-color);
+}
+
+/* --------------------------
+   Dark Mode Toggle (optional)
+--------------------------- */
+body.dark .card {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+body.dark input, body.dark select, body.dark textarea {
+  border: 1px solid var(--secondary-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+/* --------------------------
+   Animationen / kleine Effekte
+--------------------------- */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
