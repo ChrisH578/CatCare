@@ -1,7 +1,8 @@
 /* ==========================
-   CatCare Modern Style v1
+   CatCare Modern Style v2
+   Instagram-like Look
    Light & Dark Mode
-   ========================== */
+========================== */
 
 /* --------------------------
    Farben & Variablen
@@ -10,7 +11,8 @@
   --bg-color: #f4f4f6;        /* heller Hintergrund Light Mode */
   --text-color: #1a1a1a;      /* dunkler Text */
   --card-bg: #ffffff;          /* weiße Karten */
-  --accent-color: #7b5fff;    /* Buttons / Highlights */
+  --accent-color: rgba(64, 224, 208, 0.6); /* türkise Buttons transparent */
+  --accent-hover: rgba(64, 224, 208, 0.8); /* Hover Intensität */
   --secondary-color: #e0e0e0;  /* leichte Akzente / Trennlinien */
 }
 
@@ -18,8 +20,9 @@ body.dark {
   --bg-color: #1e1e2f;        /* dunkler Hintergrund Dark Mode */
   --text-color: #eaeaea;      /* heller Text */
   --card-bg: #2c2c3a;          /* Karten dunkel */
-  --accent-color: #9c7dff;    /* Buttons / Highlights */
-  --secondary-color: #3a3a4a;  /* leichte Akzente */
+  --accent-color: rgba(64, 224, 208, 0.6); /* Buttons transparent */
+  --accent-hover: rgba(64, 224, 208, 0.8); 
+  --secondary-color: #3a3a4a;  
 }
 
 /* --------------------------
@@ -68,22 +71,44 @@ p, label {
 }
 
 /* --------------------------
-   Buttons
+   Buttons modern / Instagram-style
 --------------------------- */
 button {
   background-color: var(--accent-color);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 12px 20px;
+  border-radius: 16px;           /* schön rund */
+  padding: 12px 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* leichter Schatten */
 }
 
 button:hover {
-  background-color: #5a3fcc;
+  background-color: var(--accent-hover);
   transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+/* --------------------------
+   Buttons / Navbar Layout
+--------------------------- */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;           /* Zeilen umbrechen */
+  justify-content: center;   /* mittig ausrichten */
+  background-color: var(--card-bg);
+  padding: 10px 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 16px 16px 0 0;
+}
+
+.navbar button {
+  flex: 1 1 14%;   /* max. 6 Buttons pro Reihe */
+  margin: 4px;
+  min-width: 50px;
+  text-align: center;
 }
 
 /* --------------------------
@@ -102,26 +127,7 @@ input, select, textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--accent-color);
-}
-
-/* --------------------------
-   Navigation / Footer
---------------------------- */
-.navbar {
-  display: flex;
-  justify-content: space-around;
-  background-color: var(--card-bg);
-  padding: 10px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  position: sticky;
-  bottom: 0;
-  border-radius: 16px 16px 0 0;
-}
-
-.navbar button {
-  flex: 1;
-  margin: 0 4px;
+  outline: 2px solid var(--accent-hover);
 }
 
 /* --------------------------
@@ -140,7 +146,7 @@ th, td {
 }
 
 /* --------------------------
-   Dark Mode Toggle (optional)
+   Dark Mode Anpassungen
 --------------------------- */
 body.dark .card {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
