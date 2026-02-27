@@ -1,6 +1,5 @@
 /* ==========================
-   CatCare Modern Style v2
-   Instagram-like Look
+   CatCare Modern iOS/WhatsApp-Style
    Light & Dark Mode
 ========================== */
 
@@ -8,20 +7,20 @@
    Farben & Variablen
 --------------------------- */
 :root {
-  --bg-color: #f4f4f6;        /* heller Hintergrund Light Mode */
-  --text-color: #1a1a1a;      /* dunkler Text */
-  --card-bg: #ffffff;          /* weiße Karten */
-  --accent-color: rgba(64, 224, 208, 0.6); /* türkise Buttons transparent */
-  --accent-hover: rgba(64, 224, 208, 0.8); /* Hover Intensität */
-  --secondary-color: #e0e0e0;  /* leichte Akzente / Trennlinien */
+  --bg-color: #fefefe;        /* Hintergrund Light Mode */
+  --text-color: #1c1c1c;      /* Textfarbe */
+  --card-bg: #ffffff;          /* Karten */
+  --input-bg: #f2f2f7;         /* Inputs */
+  --accent-color: #007AFF;     /* iOS Blau für Icons / Hover */
+  --secondary-color: #d1d1d6;  /* Trennlinien */
 }
 
 body.dark {
-  --bg-color: #1e1e2f;        /* dunkler Hintergrund Dark Mode */
-  --text-color: #eaeaea;      /* heller Text */
+  --bg-color: #1c1c28;        /* dunkler Hintergrund */
+  --text-color: #e6e6e6;      /* heller Text */
   --card-bg: #2c2c3a;          /* Karten dunkel */
-  --accent-color: rgba(64, 224, 208, 0.6); /* Buttons transparent */
-  --accent-hover: rgba(64, 224, 208, 0.8); 
+  --input-bg: #3a3a4a;         /* Inputs dunkel */
+  --accent-color: #0a84ff;     /* iOS Akzentfarbe */
   --secondary-color: #3a3a4a;  
 }
 
@@ -29,12 +28,12 @@ body.dark {
    Allgemeines Layout
 --------------------------- */
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Open Sans', sans-serif;
   font-size: 16px;
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
-  padding: 0;
+  padding-bottom: 70px; /* Platz für Bottom-Bar */
 }
 
 h1, h2, h3 {
@@ -48,7 +47,7 @@ p, label {
 }
 
 /* --------------------------
-   Container / Karten
+   Container / Cards
 --------------------------- */
 .container {
   max-width: 480px;
@@ -71,63 +70,22 @@ p, label {
 }
 
 /* --------------------------
-   Buttons modern / Instagram-style
---------------------------- */
-button {
-  background-color: var(--accent-color);
-  color: #fff;
-  border: none;
-  border-radius: 16px;           /* schön rund */
-  padding: 12px 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* leichter Schatten */
-}
-
-button:hover {
-  background-color: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-}
-
-/* --------------------------
-   Buttons / Navbar Layout
---------------------------- */
-.navbar {
-  display: flex;
-  flex-wrap: wrap;           /* Zeilen umbrechen */
-  justify-content: center;   /* mittig ausrichten */
-  background-color: var(--card-bg);
-  padding: 10px 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  border-radius: 16px 16px 0 0;
-}
-
-.navbar button {
-  flex: 1 1 14%;   /* max. 6 Buttons pro Reihe */
-  margin: 4px;
-  min-width: 50px;
-  text-align: center;
-}
-
-/* --------------------------
-   Formulare / Inputs
+   Inputs / Formulare
 --------------------------- */
 input, select, textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px;
   margin: 6px 0 12px 0;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--secondary-color);
-  background-color: var(--card-bg);
+  background-color: var(--input-bg);
   color: var(--text-color);
   font-size: 15px;
   box-sizing: border-box;
 }
 
 input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--accent-hover);
+  outline: 2px solid var(--accent-color);
 }
 
 /* --------------------------
@@ -146,6 +104,56 @@ th, td {
 }
 
 /* --------------------------
+   Bottom Navigation (WhatsApp-Style)
+--------------------------- */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--secondary-color);
+  box-shadow: 0 -1px 10px rgba(0,0,0,0.05);
+  z-index: 100;
+  border-radius: 16px 16px 0 0;
+}
+
+body.dark .navbar {
+  background-color: rgba(28,28,40,0.95);
+  border-top: 1px solid var(--secondary-color);
+}
+
+.navbar button {
+  flex: 1;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column; /* Icon oben, Text optional unten */
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+.navbar button:hover {
+  color: var(--accent-color);
+}
+
+.navbar button img.icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 2px;
+}
+
+/* --------------------------
    Dark Mode Anpassungen
 --------------------------- */
 body.dark .card {
@@ -154,7 +162,7 @@ body.dark .card {
 
 body.dark input, body.dark select, body.dark textarea {
   border: 1px solid var(--secondary-color);
-  background-color: var(--card-bg);
+  background-color: var(--input-bg);
   color: var(--text-color);
 }
 
