@@ -36,12 +36,13 @@ addCatBtn.addEventListener("click", () => {
 });
 
 // --- Katze hinzufügen ---
-function addCat(name, birthdate, gender) {
+function addCat(name, birthdate, gender, image) {
   const newCat = {
     id: Date.now().toString(),
     name,
     birthdate,
     gender,
+    image: image || null,
     data: {
       weight: [],
       food: [],
@@ -58,7 +59,7 @@ function addCat(name, birthdate, gender) {
   renderDashboard();
 }
 
-// --- Dashboard ---
+// --- Dashboard / Startseite ---
 function renderDashboard() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) {
@@ -71,7 +72,7 @@ function renderDashboard() {
     : "Kein Eintrag";
 
   const lastFood = cat.data.food.length
-    ? `${cat.data.food[cat.data.food.length - 1].amount} g ${cat.data.food[cat.data.food.length - 1].type}`
+    ? `${cat.data.food[cat.data.food.length - 1].amount} g ${cat.data.food[cat.data.food.length - 1].type} um ${cat.data.food[cat.data.food.length - 1].time}`
     : "Kein Eintrag";
 
   const lastPlay = cat.data.play.length
@@ -79,7 +80,8 @@ function renderDashboard() {
     : "Kein Eintrag";
 
   main.innerHTML = `
-    <div class="card">
+    <div class="card" style="text-align:center;">
+      ${cat.image ? `<img src="${cat.image}" alt="${cat.name}" style="width:150px;height:150px;object-fit:cover;border-radius:50%;margin-bottom:10px;">` : ""}
       <h2>${cat.name}</h2>
       <p>Letztes Gewicht: ${lastWeight}</p>
       <p>Letzte Fütterung: ${lastFood}</p>
@@ -99,6 +101,7 @@ function renderAddCatForm() {
         <option value="männlich">männlich</option>
         <option value="weiblich">weiblich</option>
       </select><br><br>
+      <label>Bild hochladen: <input type="file" id="catImageInput" accept="image/*"></label><br><br>
       <button onclick="createCat()">Speichern</button>
     </div>
   `;
@@ -108,148 +111,179 @@ function createCat() {
   const name = document.getElementById("name").value;
   const birthdate = document.getElementById("birthdate").value;
   const gender = document.getElementById("gender").value;
-  addCat(name, birthdate, gender);
+
+  const imageInput = document.getElementById("catImageInput");
+  if (imageInput.files && imageInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      addCat(name, birthdate, gender, e.target.result);
+    }
+    reader.readAsDataURL(imageInput.files[0]);
+  } else {
+    addCat(name, birthdate, gender, null);
+  }
 }
 
 // --- Weight Tracking ---
-function renderWeight() {
-  const cat = cats.find(c => c.id === currentCatId);
-  if (!cat) return;
-
+function renderWeights() {
   main.innerHTML = `
     <div class="card">
       <h2>Gewicht hinzufügen</h2>
-      <input id="weightValue" type="number" step="0.01" placeholder="Gewicht in kg">
+      <input id="weightValue" type="number" placeholder="Gewicht in kg">
       <button onclick="addWeight()">Speichern</button>
+      <ul id="weightList" style="margin-top:10px;"></ul>
     </div>
-    ${cat.data.weight.map(w => `
-      <div class="card">
-        ${w.date} – ${w.value} kg
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("weightList");
+  const cat = cats.find(c => c.id === currentCatId);
+  if (!cat) return;
+  cat.data.weight.forEach((w, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${w.value} kg (${w.date}) <button onclick="deleteWeight(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addWeight() {
   const value = document.getElementById("weightValue").value;
+  if (!value) return;
   const cat = cats.find(c => c.id === currentCatId);
-  cat.data.weight.push({
-    value,
-    date: new Date().toLocaleDateString()
-  });
+  cat.data.weight.push({ value, date: new Date().toLocaleDateString() });
   save();
-  renderWeight();
+  renderWeights();
+}
+
+function deleteWeight(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.weight.splice(index, 1);
+  save();
+  renderWeights();
 }
 
 // --- Food Tracking ---
 function renderFood() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) return;
-
   main.innerHTML = `
     <div class="card">
       <h2>Fütterung hinzufügen</h2>
       <input id="foodType" placeholder="Futterart (Nass/Trocken/Snack)">
       <input id="foodAmount" type="number" placeholder="Menge in g">
+      <input id="foodTime" type="time">
       <button onclick="addFood()">Speichern</button>
+      <ul id="foodList" style="margin-top:10px;"></ul>
     </div>
-    ${cat.data.food.map(f => `
-      <div class="card">
-        ${f.date} – ${f.amount} g ${f.type}
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("foodList");
+  cat.data.food.forEach((f, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${f.date} – ${f.amount} g ${f.type} um ${f.time} <button onclick="deleteFood(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addFood() {
   const type = document.getElementById("foodType").value;
   const amount = document.getElementById("foodAmount").value;
+  const time = document.getElementById("foodTime").value || "–";
+  if (!type || !amount) return;
   const cat = cats.find(c => c.id === currentCatId);
-  cat.data.food.push({
-    type,
-    amount,
-    date: new Date().toLocaleDateString()
-  });
+  cat.data.food.push({ type, amount, time, date: new Date().toLocaleDateString() });
   save();
   renderFood();
 }
 
-// --- Placeholder für Play, Sleep, Vet, Meds ---
+function deleteFood(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.food.splice(index, 1);
+  save();
+  renderFood();
+}
+
+// --- Play Tracking ---
 function renderPlay() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) return;
-
   main.innerHTML = `
     <div class="card">
       <h2>Spielzeit hinzufügen</h2>
       <input id="playType" placeholder="Art des Spiels (Laser/Feder/Ball)">
       <input id="playDuration" type="number" placeholder="Dauer in Minuten">
       <button onclick="addPlay()">Speichern</button>
+      <ul id="playList" style="margin-top:10px;"></ul>
     </div>
-    ${cat.data.play.map(p => `
-      <div class="card">
-        ${p.date} – ${p.duration} min ${p.type} ${p.notes ? '- ' + p.notes : ''}
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("playList");
+  cat.data.play.forEach((p, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${p.date} – ${p.duration} min ${p.type} ${p.notes ? '- ' + p.notes : ''} <button onclick="deletePlay(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addPlay() {
   const type = document.getElementById("playType").value;
   const duration = document.getElementById("playDuration").value;
+  if (!type || !duration) return;
   const cat = cats.find(c => c.id === currentCatId);
-  cat.data.play.push({
-    type,
-    duration,
-    date: new Date().toLocaleDateString(),
-    notes: ""
-  });
+  cat.data.play.push({ type, duration, date: new Date().toLocaleDateString(), notes: "" });
   save();
   renderPlay();
 }
+
+function deletePlay(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.play.splice(index, 1);
+  save();
+  renderPlay();
+}
+
+// --- Sleep Tracking ---
 function renderSleep() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) return;
-
   main.innerHTML = `
     <div class="card">
       <h2>Schlaf hinzufügen</h2>
       <label>Von: <input type="time" id="sleepStart"></label><br><br>
       <label>Bis: <input type="time" id="sleepEnd"></label><br><br>
       <button onclick="addSleep()">Speichern</button>
+      <ul id="sleepList" style="margin-top:10px;"></ul>
     </div>
-    ${cat.data.sleep.map(s => `
-      <div class="card">
-        ${s.date} – ${s.duration} Stunden
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("sleepList");
+  cat.data.sleep.forEach((s, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${s.date} – ${s.duration} Stunden <button onclick="deleteSleep(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addSleep() {
   const start = document.getElementById("sleepStart").value;
   const end = document.getElementById("sleepEnd").value;
   if (!start || !end) return alert("Bitte Start- und Endzeit eingeben");
-
   const startDate = new Date("1970-01-01T" + start);
   const endDate = new Date("1970-01-01T" + end);
-  let diff = (endDate - startDate) / 1000 / 60 / 60; // Stunden
-  if (diff < 0) diff += 24; // Über Mitternacht
-
+  let diff = (endDate - startDate) / 1000 / 60 / 60;
+  if (diff < 0) diff += 24;
   const cat = cats.find(c => c.id === currentCatId);
-  cat.data.sleep.push({
-    start,
-    end,
-    duration: diff.toFixed(2),
-    date: new Date().toLocaleDateString()
-  });
+  cat.data.sleep.push({ start, end, duration: diff.toFixed(2), date: new Date().toLocaleDateString() });
   save();
   renderSleep();
 }
+
+function deleteSleep(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.sleep.splice(index, 1);
+  save();
+  renderSleep();
+}
+
+// --- Vet Tracking ---
 function renderVet() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) return;
-
   main.innerHTML = `
     <div class="card">
       <h2>Tierarztbesuch hinzufügen</h2>
@@ -258,13 +292,15 @@ function renderVet() {
       <input id="vetDiagnosis" placeholder="Diagnose"><br><br>
       <input id="vetNotes" placeholder="Notizen"><br><br>
       <button onclick="addVet()">Speichern</button>
+      <ul id="vetList" style="margin-top:10px;"></ul>
     </div>
-    ${cat.data.vet.map(v => `
-      <div class="card">
-        ${v.date} – ${v.reason} – ${v.diagnosis} ${v.notes ? '- ' + v.notes : ''}
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("vetList");
+  cat.data.vet.forEach((v, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${v.date} – ${v.reason} – ${v.diagnosis} ${v.notes ? '- ' + v.notes : ''} <button onclick="deleteVet(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addVet() {
@@ -272,26 +308,24 @@ function addVet() {
   const reason = document.getElementById("vetReason").value;
   const diagnosis = document.getElementById("vetDiagnosis").value;
   const notes = document.getElementById("vetNotes").value;
-
   if (!date || !reason) return alert("Bitte Datum und Grund eingeben");
-
   const cat = cats.find(c => c.id === currentCatId);
-  cat.data.vet.push({
-    date,
-    reason,
-    diagnosis,
-    notes
-  });
+  cat.data.vet.push({ date, reason, diagnosis, notes });
   save();
   renderVet();
 }
+
+function deleteVet(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.vet.splice(index, 1);
+  save();
+  renderVet();
+}
+
+// --- Meds Tracking ---
 function renderMeds() {
   const cat = cats.find(c => c.id === currentCatId);
   if (!cat) return;
-
-  const activeMeds = cat.data.medication.filter(m => m.status === "aktiv");
-  const archivedMeds = cat.data.medication.filter(m => m.status === "abgeschlossen");
-
   main.innerHTML = `
     <div class="card">
       <h2>Medikament hinzufügen</h2>
@@ -301,23 +335,15 @@ function renderMeds() {
       <label>Ende: <input type="date" id="medEnd"></label><br><br>
       <input id="medNotes" placeholder="Notizen"><br><br>
       <button onclick="addMed()">Speichern</button>
+      <ul id="medList" style="margin-top:10px;"></ul>
     </div>
-
-    <h3>Aktive Medikamente</h3>
-    ${activeMeds.map(m => `
-      <div class="card">
-        ${m.name} – ${m.dose} – ${m.start} bis ${m.end}
-        <button onclick="completeMed('${m.date}')">Abschließen</button>
-      </div>
-    `).join("")}
-
-    <h3>Archiv</h3>
-    ${archivedMeds.map(m => `
-      <div class="card">
-        ${m.name} – ${m.dose} – ${m.start} bis ${m.end}
-      </div>
-    `).join("")}
   `;
+  const list = document.getElementById("medList");
+  cat.data.medication.forEach((m, index) => {
+    let li = document.createElement("li");
+    li.innerHTML = `${m.name} – ${m.dose} – ${m.start} bis ${m.end} ${m.status === "aktiv" ? `<button onclick="completeMed('${m.date}')">Abschließen</button>` : ""} <button onclick="deleteMed(${index})" class="deleteBtn">❌</button>`;
+    list.appendChild(li);
+  });
 }
 
 function addMed() {
@@ -326,20 +352,9 @@ function addMed() {
   const start = document.getElementById("medStart").value;
   const end = document.getElementById("medEnd").value;
   const notes = document.getElementById("medNotes").value;
-
   if (!name || !dose || !start) return alert("Bitte Name, Dosierung und Startdatum eingeben");
-
   const cat = cats.find(c => c.id === currentCatId);
-  const newMed = {
-    name,
-    dose,
-    start,
-    end: end || "",
-    notes,
-    status: "aktiv",
-    date: Date.now().toString()
-  };
-  cat.data.medication.push(newMed);
+  cat.data.medication.push({ name, dose, start, end: end || "", notes, status: "aktiv", date: Date.now().toString() });
   save();
   renderMeds();
 }
@@ -352,13 +367,19 @@ function completeMed(date) {
   renderMeds();
 }
 
+function deleteMed(index) {
+  const cat = cats.find(c => c.id === currentCatId);
+  cat.data.medication.splice(index, 1);
+  save();
+  renderMeds();
+}
+
 // --- Settings ---
 function renderSettings() {
   main.innerHTML = `
     <div class="card">
       <h2>Einstellungen</h2>
-      <button onclick="toggleTheme()">Dark / Light wechseln</button>
-      <br><br>
+      <button onclick="toggleTheme()">Dark / Light wechseln</button><br><br>
       <button onclick="exportData()">Backup exportieren</button>
       <input type="file" onchange="importData(event)">
     </div>
@@ -366,6 +387,7 @@ function renderSettings() {
 }
 
 function toggleTheme() { document.body.classList.toggle("light"); }
+
 function exportData() {
   const blob = new Blob([JSON.stringify(cats)], { type: "application/json" });
   const a = document.createElement("a");
@@ -373,6 +395,7 @@ function exportData() {
   a.download = "catcare_backup.json";
   a.click();
 }
+
 function importData(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
@@ -390,7 +413,7 @@ document.querySelectorAll(".bottom-nav button").forEach(btn => {
   btn.addEventListener("click", () => {
     const page = btn.dataset.page;
     if (page === "dashboard") renderDashboard();
-    if (page === "weight") renderWeight();
+    if (page === "weight") renderWeights();
     if (page === "food") renderFood();
     if (page === "play") renderPlay();
     if (page === "sleep") renderSleep();
