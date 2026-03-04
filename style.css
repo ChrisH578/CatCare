@@ -1,179 +1,139 @@
-/* ==========================
-   CatCare Modern iOS/WhatsApp-Style
-   Light & Dark Mode
-========================== */
-
-/* --------------------------
-   Farben & Variablen
---------------------------- */
-:root {
-  --bg-color: #fefefe;        /* Hintergrund Light Mode */
-  --text-color: #1c1c1c;      /* Textfarbe */
-  --card-bg: #ffffff;          /* Karten */
-  --input-bg: #f2f2f7;         /* Inputs */
-  --accent-color: #007AFF;     /* iOS Blau für Icons / Hover */
-  --secondary-color: #d1d1d6;  /* Trennlinien */
-}
-
-body.dark {
-  --bg-color: #1c1c28;        /* dunkler Hintergrund */
-  --text-color: #e6e6e6;      /* heller Text */
-  --card-bg: #2c2c3a;          /* Karten dunkel */
-  --input-bg: #3a3a4a;         /* Inputs dunkel */
-  --accent-color: #0a84ff;     /* iOS Akzentfarbe */
-  --secondary-color: #3a3a4a;  
-}
-
-/* --------------------------
-   Allgemeines Layout
---------------------------- */
+/* --- Allgemein --- */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Open Sans', sans-serif;
-  font-size: 16px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
   margin: 0;
-  padding-bottom: 70px; /* Platz für Bottom-Bar */
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f4f5;
+  color: #333;
 }
 
-h1, h2, h3 {
-  font-weight: 600;
-  margin: 12px 0;
-}
-
-p, label {
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-/* --------------------------
-   Container / Cards
---------------------------- */
-.container {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 16px;
+h2, h3 {
+  margin: 0 0 10px 0;
+  font-weight: 500;
 }
 
 .card {
-  background-color: var(--card-bg);
-  padding: 16px;
-  margin: 12px 0;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-}
-
-/* --------------------------
-   Inputs / Formulare
---------------------------- */
-input, select, textarea {
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0 12px 0;
+  background-color: #fff;
   border-radius: 12px;
-  border: 1px solid var(--secondary-color);
-  background-color: var(--input-bg);
-  color: var(--text-color);
-  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px 20px;
+  margin-bottom: 15px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
   box-sizing: border-box;
 }
 
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--accent-color);
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-/* --------------------------
-   Tabellen / Listen
---------------------------- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
+button:hover {
+  background-color: #4338ca;
 }
 
-th, td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--secondary-color);
+.deleteBtn {
+  background-color: #ef4444;
+  margin-left: 10px;
 }
 
-/* --------------------------
-   Bottom Navigation (WhatsApp-Style)
---------------------------- */
-.navbar {
+.deleteBtn:hover {
+  background-color: #b91c1c;
+}
+
+/* --- Dashboard / Startseite --- */
+#mainContent {
+  padding: 20px;
+}
+
+.cat-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* --- Listen --- */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 60px;
-  background-color: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
+  background-color: #fff;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid var(--secondary-color);
-  box-shadow: 0 -1px 10px rgba(0,0,0,0.05);
-  z-index: 100;
-  border-radius: 16px 16px 0 0;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -1px 6px rgba(0,0,0,0.05);
 }
 
-body.dark .navbar {
-  background-color: rgba(28,28,40,0.95);
-  border-top: 1px solid var(--secondary-color);
-}
-
-.navbar button {
+.bottom-nav button {
   flex: 1;
+  padding: 12px 0;
+  font-size: 14px;
   background: none;
-  border: none;
-  display: flex;
-  flex-direction: column; /* Icon oben, Text optional unten */
-  align-items: center;
-  justify-content: center;
-  color: var(--text-color);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 6px 0;
-  transition: color 0.2s ease;
+  color: #4f46e5;
+  font-weight: 500;
 }
 
-.navbar button:hover {
-  color: var(--accent-color);
+.bottom-nav button:hover {
+  background-color: #f0f0ff;
 }
 
-.navbar button img.icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 2px;
+/* --- Light Theme --- */
+body.light {
+  background-color: #fff;
+  color: #111;
 }
 
-/* --------------------------
-   Dark Mode Anpassungen
---------------------------- */
-body.dark .card {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+body.light .card {
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-body.dark input, body.dark select, body.dark textarea {
-  border: 1px solid var(--secondary-color);
-  background-color: var(--input-bg);
-  color: var(--text-color);
+/* --- Inputs & Forms --- */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-/* --------------------------
-   Animationen / kleine Effekte
---------------------------- */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
+/* --- Responsive --- */
+@media (max-width: 500px) {
+  .card {
+    padding: 12px 15px;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  button {
+    width: 100%;
+  }
 }
