@@ -45,7 +45,7 @@ function renderDashboard() {
     ? `${cat.data.play[cat.data.play.length - 1].duration} min ${cat.data.play[cat.data.play.length - 1].type}`
     : "Kein Eintrag";
 
-  main.innerHTML = `
+  let dashboardHTML = `
     <div class="card">
       ${cat.image ? `<img src="${cat.image}" class="cat-image">` : ''}
       <h2>${cat.name}</h2>
@@ -54,6 +54,50 @@ function renderDashboard() {
       <p>Letztes Spiel: ${lastPlay}</p>
     </div>
   `;
+
+  if (cat.data.weight.length > 0) {
+    dashboardHTML += `
+      <div class="card">
+        <h3>Gewichtsverlauf</h3>
+        <canvas id="weightChart"></canvas>
+      </div>
+    `;
+  }
+
+  main.innerHTML = dashboardHTML;
+
+  if (cat.data.weight.length > 0) {
+    renderWeightChart(cat);
+  }
+}
+
+// --- Gewichtsdiagramm ---
+function renderWeightChart(cat) {
+  const ctx = document.getElementById("weightChart").getContext("2d");
+  const labels = cat.data.weight.map(w => w.date);
+  const data = cat.data.weight.map(w => parseFloat(w.value));
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Gewicht in kg",
+        data: data,
+        borderColor: "#4CAF50",
+        backgroundColor: "rgba(76, 175, 80, 0.2)",
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        y: { beginAtZero: false }
+      }
+    }
+  });
 }
 
 // --- Add Cat Form ---
@@ -98,14 +142,7 @@ function addCat(name, birthdate, gender, image) {
     birthdate,
     gender,
     image: image,
-    data: {
-      weight: [],
-      food: [],
-      play: [],
-      sleep: [],
-      vet: [],
-      medication: []
-    }
+    data: { weight: [], food: [], play: [], sleep: [], vet: [], medication: [] }
   };
   cats.push(newCat);
   currentCatId = newCat.id;
@@ -126,9 +163,7 @@ function renderWeights() {
       <button onclick="addWeight()">Speichern</button>
     </div>
     <ul id="weightList">
-      ${cat.data.weight.map((w, index) => `
-        <li>${w.value} kg (${w.date}) <button onclick="deleteWeight(${index})" class="deleteBtn">❌</button></li>
-      `).join("")}
+      ${cat.data.weight.map((w, index) => `<li>${w.value} kg (${w.date}) <button onclick="deleteWeight(${index})" class="deleteBtn">❌</button></li>`).join("")}
     </ul>
   `;
 }
@@ -162,12 +197,7 @@ function renderFood() {
       <button onclick="addFood()">Speichern</button>
     </div>
     <ul id="foodList">
-      ${cat.data.food.map((f, index) => `
-        <li>
-          ${f.date} – ${f.amount} g ${f.type} um ${f.time} 
-          <button onclick="deleteFood(${index})" class="deleteBtn">❌</button>
-        </li>
-      `).join("")}
+      ${cat.data.food.map((f, index) => `<li>${f.date} – ${f.amount} g ${f.type} um ${f.time} <button onclick="deleteFood(${index})" class="deleteBtn">❌</button></li>`).join("")}
     </ul>
   `;
 }
@@ -202,9 +232,7 @@ function renderPlay() {
       <button onclick="addPlay()">Speichern</button>
     </div>
     <ul id="playList">
-      ${cat.data.play.map((p, index) => `
-        <li>${p.date} – ${p.duration} min ${p.type} <button onclick="deletePlay(${index})" class="deleteBtn">❌</button></li>
-      `).join("")}
+      ${cat.data.play.map((p, index) => `<li>${p.date} – ${p.duration} min ${p.type} <button onclick="deletePlay(${index})" class="deleteBtn">❌</button></li>`).join("")}
     </ul>
   `;
 }
@@ -307,8 +335,12 @@ function renderMeds() {
       <input id="medNotes" placeholder="Notizen"><br><br>
       <button onclick="addMed()">Speichern</button>
     </div>
-    <h3>Aktiv</h3><ul>${active.map((m,index)=>`<li>${m.name} – ${m.dose} <button onclick="completeMed('${m.date}')">Abschließen</button><button onclick="deleteMed(${index})" class="deleteBtn">❌</button></li>`).join("")}</ul>
-    <h3>Archiv</h3><ul>${archived.map((m,index)=>`<li>${m.name} – ${m.dose} <button onclick="deleteMed(${index},true)" class="deleteBtn">❌</button></li>`).join("")}</ul>
+    <h3>Aktiv</h3><ul>
+      ${active.map((m,index)=>`<li>${m.name} – ${m.dose} <button onclick="completeMed('${m.date}')">Abschließen</button><button onclick="deleteMed(${index})" class="deleteBtn">❌</button></li>`).join("")}
+    </ul>
+    <h3>Archiv</h3><ul>
+      ${archived.map((m,index)=>`<li>${m.name} – ${m.dose} <button onclick="deleteMed(${index},true)" class="deleteBtn">❌</button></li>`).join("")}
+    </ul>
   `;
 }
 
@@ -330,9 +362,19 @@ function completeMed(date){ const cat=cats.find(c=>c.id===currentCatId); const m
 function deleteMed(index,archived=false){
   const cat=cats.find(c=>c.id===currentCatId);
   if(!cat) return;
-  if(archived){ const meds=cat.data.medication.filter(m=>m.status==="abgeschlossen"); const m=meds[index]; const i=cat.data.medication.findIndex(x=>x.date===m.date); if(i!==-1)cat.data.medication.splice(i,1);}
-  else{ const meds=cat.data.medication.filter(m=>m.status==="aktiv"); const m=meds[index]; const i=cat.data.medication.findIndex(x=>x.date===m.date); if(i!==-1)cat.data.medication.splice(i,1);}
-  save(); renderMeds();
+  if(archived){
+    const meds=cat.data.medication.filter(m=>m.status==="abgeschlossen");
+    const m=meds[index];
+    const i=cat.data.medication.findIndex(x=>x.date===m.date);
+    if(i!==-1)cat.data.medication.splice(i,1);
+  } else {
+    const meds=cat.data.medication.filter(m=>m.status==="aktiv");
+    const m=meds[index];
+    const i=cat.data.medication.findIndex(x=>x.date===m.date);
+    if(i!==-1)cat.data.medication.splice(i,1);
+  }
+  save();
+  renderMeds();
 }
 
 // --- Settings ---
